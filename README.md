@@ -1,4 +1,8 @@
-Hantepay Whmcs支付插件使用说明：
+HantePay简介：
+    HantePay汉特支付是美国的微信支付和支付宝的官方服务商，为美国商户提供跨境收款服务。美国的微信支付宝的资金流程是：客人支付人民币，商家收美金。HantePay同事免费提供各种系统的支付插件，Whmcs是其中一个插件。
+
+
+HantePay Whmcs支付插件使用说明：
 
 1、把gateways文件夹下面的文件上传到whmcs安装目录里面的modules/gateways/目录下。
 
