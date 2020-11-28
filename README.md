@@ -9,3 +9,9 @@ Hantepay whmcs支付插件使用说明：
 注意：
 
 订单货币单位为CNY（人名币时，金额需大等于￥0.1）；
+
+商户申请链接：  https://www.hante.com/merchant/
+
+商务支持电话：+1-833-833-8033
+
+技术支持： Support@hante.com
