@@ -65,12 +65,12 @@ function hantepay_alipay_link($params){
     ];
 
     if($currency =='CNY'){
-        $requestParams['rmb_amount']=$amount * 100;
+        $requestParams['rmb_amount']= intval(strval($amount * 100));
     }else{
         if($currency == 'JPY'){
-            $requestParams['amount']=$amount;
+            $requestParams['amount']= intval(strval($amount * 100));
         }else{
-            $requestParams['amount']=$amount * 100;
+            $requestParams['amount']= intval(strval($amount * 100));
         }
     }
     if($Hantepay->isMobile()){
@@ -163,12 +163,12 @@ function hantepay_alipay_refund($params){
     $currency = $params['currency'];
     $amount = $params['amount'];
     if($currency =='CNY'){
-        $requestParams['refund_rmb_amount']=$amount * 100;
+        $requestParams['refund_rmb_amount']= intval(strval($amount * 100));
     }else{
         if($currency == 'JPY'){
-            $requestParams['refund_amount']=$amount;
+            $requestParams['refund_amount']= intval(strval($amount * 100));
         }else{
-            $requestParams['refund_amount']=$amount * 100;
+            $requestParams['refund_amount']= intval(strval($amount * 100));
         }
     }
     $signature = $Hantepay->generateSign($requestParams,$params['ApiToken']);
