@@ -2,11 +2,11 @@
 
 class Hantepay {
 
-    //单号前缀
-    public $order_no_prefix='9876543210';
+
+
 
     //校验请求返回参数
-    public function checkRespose($data,$apiToken=''){
+    public function checkRespose($data,$gateway){
         if($data['trade_status']!='success'){
             switch ($data['trade_status']){
                 case 'pending':
@@ -21,8 +21,64 @@ class Hantepay {
             exit($msg);
         }
         //校验签名
-        if(!$this->checkSign($data,$apiToken)){
-            exit('签名校验失败');
+        if(!$this->checkSign($data,$gateway['ApiToken'])){
+            //查询Hantepay订单
+            if($this->queryHantepayOrder($data['out_trade_no'],$gateway)){
+                return true;
+            }else{
+                exit('order fail');
+            }
+        }
+    }
+
+
+    //查询Hantepay订单
+    public function queryHantepayOrder($outTradeNo,$gateway){
+
+        $ApiToken = $gateway['ApiToken'];
+        $MerchantNo = $gateway['MerchantNo'];
+        $StoreNo = $gateway['StoreNo'];
+
+        $nonceStr = md5(uniqid(microtime(true),true));
+        $time = strtotime(gmdate("Y-m-d\TH:i:s\Z"));
+
+        $requestParams=[
+            'merchant_no'=>$MerchantNo,
+            'store_no'=>$StoreNo,
+            'sign_type'=>'MD5',
+            'nonce_str' => $nonceStr ,
+            'time' =>$time,
+            'trade_no'=>$outTradeNo
+        ];
+
+        $signature = $this->generateSign($requestParams,$ApiToken);
+
+        $requestParams['signature'] = $signature;
+
+        $params =  $this->formatGetUrlParams($requestParams);
+
+        $url = 'https://gateway.hantepay.com/v2/gateway/orderquery?'.$params;
+
+        $header=[
+            'Accept:application/json',
+            'Content-Type:application/json'
+        ];
+
+        $response  = $this->httpRequestGet($url,$header);
+
+        $result = json_decode($response);
+
+        if($result->return_code == "ok" && $result->result_code == "SUCCESS"){
+
+            $trade_status= $result->data->trade_status;
+
+            if($trade_status =='success'){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
         }
     }
 
@@ -59,14 +115,47 @@ class Hantepay {
         return $buff;
     }
 
+    //格式化GET请求参数
+    private function formatGetUrlParams(array $data) {
+        $buff = "";
+        foreach ($data as $k => $v) {
+            if ($v !== "" && !is_array($v)) {
+                $buff .= $k . "=" . $v . "&";
+            }
+        }
+        $buff = trim($buff, "&");
+        return $buff;
+    }
+
     //http请求
     public function httpRequest($url, $data = '',$headers = []) {
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS , $data);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $output = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);    // 获取响应状态码
+        $error = curl_error($ch);
+        curl_close($ch);
+        if ($http_code != 200) {
+            exit("error:{$error}");
+        }
+        return $output;
+    }
+
+    //http请求
+    public function httpRequestGet($url,$headers = []) {
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $output = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);    // 获取响应状态码

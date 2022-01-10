@@ -16,6 +16,7 @@ if(!$respose){
 if(!isset($respose['note'])){
     exit('支付失败，返回信息不正确');
 }
+
 $note=explode('|',$respose['note']);
 $gatewayModuleName=$note[0];
 $currency=$note[1];
@@ -27,10 +28,12 @@ if (!$gateway || !$gateway["type"]) {
 
 $Hantepay=new Hantepay();
 //校验参数
-$Hantepay->checkRespose($respose,$gateway['ApiToken']);
+$Hantepay->checkRespose($respose,$gateway);
 
 //支付成功trade_no
 $gatewayModuleName=$gateway["paymentmethod"];
+
+
 $invoiceid=substr($respose['trade_no'],10);
 $transid=$respose['out_trade_no'];
 //金额
@@ -52,4 +55,4 @@ checkCbTransID($transid);
 addInvoicePayment($invoiceid, $transid, $amount, $fee, $gatewayModuleName);
 logTransaction($gateway['name'], $_POST, "Successful");
 
-echo 'SUCCESS';
+echo $gatewayModuleName;

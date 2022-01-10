@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Hantepay 支付宝支付
+ * Plugin Name: Hantepay 银联云闪付
  * Description: hantepay payment gateway plugin for WHMCS
  * Version: 1.0
  * Compatible with: WHMCS 7.6.0
@@ -11,11 +11,11 @@
 
 require_once realpath(dirname(__FILE__)) . "/libs/Hantepay.class.php";
 
-function hantepay_alipay_config() {
+function hantepay_unionpay_config() {
     $configarray = [
         "FriendlyName" => [
             "Type" => "System",
-            "Value"=>"Hantepay 支付宝支付"
+            "Value"=>"Hantepay 银联云闪付"
         ],
         "ApiToken" => [
             "FriendlyName" => "Api Token",
@@ -41,7 +41,7 @@ function hantepay_alipay_config() {
     return $configarray;
 }
 
-function hantepay_alipay_link($params){
+function hantepay_unionpay_link($params){
     $Hantepay=new Hantepay();
     $apiToken = $params['ApiToken'];
     $currency = $params['currency'];
@@ -57,7 +57,7 @@ function hantepay_alipay_link($params){
         'time' =>$time,
         'out_trade_no'=>$time.$params['invoiceid'],
         'currency'=>'USD',
-        'payment_method'=>'alipay',
+        'payment_method'=>'unionpay',
         'notify_url'=>$systemUrl."modules/gateways/libs/callback/notify.php",
         'callback_url'=>$systemUrl."modules/gateways/libs/callback/callback.php",
         'body'=>'merchant:'.$params['MerchantName'].'|'.'invoices:'.$params['invoiceid'],
@@ -65,12 +65,12 @@ function hantepay_alipay_link($params){
     ];
 
     if($currency =='CNY'){
-        $requestParams['rmb_amount']= ceil($amount * 100);
+        $requestParams['rmb_amount']=ceil($amount * 100);
     }else{
         if($currency == 'JPY'){
-            $requestParams['amount']= ceil($amount);
+            $requestParams['amount']=ceil($amount);
         }else{
-            $requestParams['amount']= ceil($amount * 100);
+            $requestParams['amount']=ceil($amount * 100);
         }
     }
     if($Hantepay->isMobile()){
@@ -118,8 +118,8 @@ function hantepay_alipay_link($params){
     </style>
     <div class="hantepay-container">
         <div id="hantepay_pay">
-            <img src="<?php echo $systemUrl.'modules/gateways/assets/images/alipay_logo.png';?>" alt="">
-            Hantepay 支付宝支付
+            <img src="<?php echo $systemUrl.'modules/gateways/assets/images/unionpay_logo.png';?>" alt="">
+            Hantepay 银联云闪付
         </div>
     </div>
     <script type="text/javascript" src="<?php echo $systemUrl.'modules/gateways/assets/js/hantepay.js';?>"></script>
@@ -144,7 +144,7 @@ function hantepay_alipay_link($params){
     return ob_get_clean();
 }
 
-function hantepay_alipay_refund($params){
+function hantepay_unionpay_refund($params){
     $Hantepay=new Hantepay();
     $time = strtotime(gmdate("Y-m-d\TH:i:s\Z"));
     $nonceStr = md5(uniqid(microtime(true),true));
@@ -162,12 +162,12 @@ function hantepay_alipay_refund($params){
     $currency = $params['currency'];
     $amount = $params['amount'];
     if($currency =='CNY'){
-        $requestParams['refund_rmb_amount']=($amount * 100);
+        $requestParams['refund_rmb_amount']= ceil($amount * 100);
     }else{
         if($currency == 'JPY'){
-            $requestParams['refund_amount']=ceil($amount);
+            $requestParams['refund_amount']= ceil($amount);
         }else{
-            $requestParams['refund_amount']=ceil($amount * 100);
+            $requestParams['refund_amount']= ceil($amount * 100);
         }
     }
     $signature = $Hantepay->generateSign($requestParams,$params['ApiToken']);

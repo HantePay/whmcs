@@ -65,12 +65,12 @@ function hantepay_wxpay_link($params){
     ];
 
     if($currency =='CNY'){
-        $requestParams['rmb_amount']= intval(strval($amount * 100));
+        $requestParams['rmb_amount']= ceil($amount * 100);
     }else{
         if($currency == 'JPY'){
-            $requestParams['amount']= intval(strval($amount * 100));
+            $requestParams['amount']= ceil($amount);
         }else{
-            $requestParams['amount']= intval(strval($amount * 100));
+            $requestParams['amount']= ceil($amount * 100);
         }
     }
     if($Hantepay->isMobile()){
@@ -123,7 +123,6 @@ function hantepay_wxpay_link($params){
             Hantepay 微信支付
         </div>
     </div>
-    <script type="text/javascript" src="<?php echo $systemUrl.'modules/gateways/assets/js/jquery/1.9.1/jquery.min.js';?>"></script>
     <script type="text/javascript" src="<?php echo $systemUrl.'modules/gateways/assets/js/hantepay.js';?>"></script>
     <script type="text/javascript">
         $('#hantepay_pay').click(function () {
@@ -164,12 +163,12 @@ function hantepay_wxpay_refund($params){
     $currency = $params['currency'];
     $amount = $params['amount'];
     if($currency =='CNY'){
-        $requestParams['refund_rmb_amount']= intval(strval($amount * 100));
+        $requestParams['refund_rmb_amount']=ceil($amount * 100);
     }else{
         if($currency == 'JPY'){
-            $requestParams['refund_amount']= intval(strval($amount * 100));
+            $requestParams['refund_amount']=ceil($amount);
         }else{
-            $requestParams['refund_amount']= intval(strval($amount * 100));
+            $requestParams['refund_amount']=ceil($amount * 100);
         }
     }
     $signature = $Hantepay->generateSign($requestParams,$params['ApiToken']);

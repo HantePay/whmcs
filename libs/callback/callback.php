@@ -11,7 +11,6 @@ $url = $_SERVER['QUERY_STRING'];
 
 parse_str(urldecode($url),$query_arr);
 
-
 if(!$query_arr){
     exit('支付失败，无返回结果');
 }
@@ -35,7 +34,7 @@ if (!$gateway || !$gateway["type"]) {
 
 $Hantepay=new Hantepay();
 //校验参数
-$Hantepay->checkRespose($query_arr,$gateway['ApiToken']);
+$Hantepay->checkRespose($query_arr,$gateway);
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

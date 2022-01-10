@@ -1,6 +1,6 @@
 ;(function ($) {
     /**
-     * Author: lz
+     * Author: zlf
      *
      * @param {Object} options
      * url[string]:                 必须，上传地址
